@@ -7,7 +7,7 @@ import MovieThumb from  '../elements/MovieThumb/MovieThumb';
 import LoadMoreBtn from '../elements/LoadMoreBtn/LoadMoreBtn';
 import Spinner from '../elements/Spinner/Spinner';
 import './Home.css';
-import { end } from 'worker-farm';
+
 
 class Home extends Component {
     state = {
@@ -18,7 +18,6 @@ class Home extends Component {
         totalPage : 0,
         searchTerm : ''
     }
-
 
 componentDidMount() {
     this.setState({loading:true});
@@ -43,31 +42,31 @@ searchItems = (searchTerm) => {
     this.fetchItems(endpoint);
 }
 
-loadMoreItems = ()  => {
-    let endpoint =  '';
-    this.setState({loading:true});
+loadMoreItems = () => {
+    let endpoint = '';
+    this.setState =({loading : true});
 
-    if (this.setState.searchTerm === '') {
-        endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=${this.state.currentPage + 1}`;
+    if (this.setState.searchTerm === ' '){
+        endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US$page=${this.state.currentPage + 1}`;
     } else {
-        endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${this.state.searchTerm}`;
+        endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${this.state.searchTerm}page=${this.state.currentPage + 1}`;
     }
+    this.fetchItems(endpoint);
 }
 
 fetchItems = (endpoint) => {
     fetch(endpoint)
     .then(result => result.json())
     .then(result => {
-        console.log(result);
-        this.setState({
-            movies:[ ...this.state.movies, ...result.results],
-            heroImage: this.state.heroImage || result.results[0],
-            loading: false,
-            currentPage: result.page,
-            totalPage: result.total_pages
-        })
-    })
-};
+      this.setState({
+        movies: [ ...this.state.movies, ...result.results],
+        heroImage: this.state.heroImage || result.results[0],
+        loading: false,
+        currentPage: result.page,
+        totalPages: result.total_pages
+    });
+  });
+}
 
     render () {
         return(
@@ -90,14 +89,15 @@ fetchItems = (endpoint) => {
                     return <MovieThumb
                       key = {i}
                       clickable={true}
-                      image = { element.poster_path? `${IMAGE_BASE_URL}${POSTER_SIZE}{element.poster_path}` : '../images/no_image.jpg'}
+                      image = { element.poster_path? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_path}` : '../images/no_image.jpg'}
                       movieId = {element.id}
                       movieName = {element.original_title}/>
                      })}
                 </FourColGrid>
              </div>
-             <Spinner/>
-             <LoadMoreBtn/>
+             {this.state.loading ? <Spinner/> : null }
+             {(this.state.currentPage <= this.state.totalPages && !this.state.loading) ?
+              <LoadMoreBtn text="Load More" onClick = {this.loadMoreItems}/> : null }
             </div>
         )
     }
